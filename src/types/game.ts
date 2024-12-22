@@ -129,3 +129,18 @@ export interface GameState {
   availablePlantSlots: number;
   nextPlantAvailableAt: number;
 }
+
+export interface PlantStatus {
+  needsWater: boolean;
+  needsPesticide: boolean;
+  isHealthy: boolean;
+}
+
+export interface PlantStage {
+  level: number;
+  name: string;
+  requirements: {
+    water: number;
+    pesticide: boolean;
+  };
+}

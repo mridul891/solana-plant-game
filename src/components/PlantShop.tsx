@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlantType, PLANT_TYPES, GameLevel } from '../types/game';
+import { handlePesticidePurchase, handleWaterPurchase } from '../components/GameLogic';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 
 interface PlantShopProps {
   isOpen: boolean;
@@ -180,6 +182,41 @@ const PlantShop: React.FC<PlantShopProps> = ({
   pesticidesNeeded,
   solBalance
 }) => {
+  const wallet = useWallet();
+  const { connection } = useConnection();
+
+  const handlePesticideClick = async () => {
+    await handlePesticidePurchase(
+      wallet,
+      connection,
+      0.1, // Pesticide cost in SOL
+      () => {
+        onBuyPesticide();
+        alert('Pesticide purchased successfully!');
+      },
+      (error) => {
+        console.error('Pesticide purchase failed:', error);
+        alert('Pesticide purchase failed. Please try again.');
+      }
+    );
+  };
+
+  const handleWaterClick = async () => {
+    await handleWaterPurchase(
+      wallet,
+      connection,
+      0.1, // Water cost in SOL
+      () => {
+        onBuyWater();
+        alert('Water purchased successfully!');
+      },
+      (error) => {
+        console.error('Water purchase failed:', error);
+        alert('Water purchase failed. Please try again.');
+      }
+    );
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -211,7 +248,7 @@ const PlantShop: React.FC<PlantShopProps> = ({
                   </ResourceDescription>
                   <ResourcePrice>0.1 SOL</ResourcePrice>
                   <BuyButton
-                    onClick={onBuyWater}
+                    onClick={handleWaterClick}
                     disabled={!canBuyWater}
                   >
                     {canBuyWater ? 'Buy Water (+5)' : 'Daily Limit Reached'}
@@ -228,7 +265,7 @@ const PlantShop: React.FC<PlantShopProps> = ({
                     </ResourceDescription>
                     <ResourcePrice>0.1 SOL</ResourcePrice>
                     <BuyButton
-                      onClick={onBuyPesticide}
+                      onClick={handlePesticideClick}
                       disabled={!canBuyPesticide}
                       $highlight={pesticidesNeeded}
                     >
